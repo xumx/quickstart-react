@@ -58,12 +58,10 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const clinicId = "4ce4d519-6c69-486e-868a-81ee628f199f";
-
   // call start handler
-  const startCallInline = () => {
+  const startCallInline = (assistantId) => {
     setConnecting(true);
-    vapi.start(clinicId);
+    vapi.start(assistantId);
   };
   const endCall = () => {
     vapi.stop();
@@ -79,19 +77,27 @@ const App = () => {
         alignItems: "center",
       }}
     >
-      {!connected ? (
-        <Button
-          label="Call Clinic"
-          onClick={startCallInline}
-          isLoading={connecting}
-        />
-      ) : (
+      
+
+      {connected ? (
         <ActiveCallDetail
           assistantIsSpeaking={assistantIsSpeaking}
           volumeLevel={volumeLevel}
           onEndCallClick={endCall}
         />
-      )}
+      ): (<div>
+        <Button
+          label="Call Clinic"
+          onClick={() => startCallInline("4ce4d519-6c69-486e-868a-81ee628f199f")}
+          isLoading={connecting}
+        />
+        <br></br>
+        <Button
+          label="Call Olinqua"
+          onClick={() => startCallInline("ee4b70e7-f13a-4361-a659-a0a53fa64369")}
+          isLoading={connecting}
+        />
+      </div>)}
 
       {showPublicKeyInvalidMessage ? <PleaseSetYourPublicKeyMessage /> : null}
     </div>
