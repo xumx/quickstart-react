@@ -22,11 +22,10 @@ const Button = ({ label, onClick, isLoading, disabled }) => {
     <button
       onClick={onClick}
       style={{
-        backgroundColor: "white",
-        color: "black",
-        border: "2px solid #ddd",
-        borderRadius: "8px",
-        padding: "8px 20px",
+        backgroundColor: "rgb(28, 87, 217)",
+        color: "white",
+        borderRadius: "100rem",
+        padding: ".75rem 1.5rem",
         fontSize: "16px",
         outline: "none",
         boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
