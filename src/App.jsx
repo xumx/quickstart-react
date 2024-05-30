@@ -71,8 +71,7 @@ const App = () => {
       backgroundColor="black"
       className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen"
     >
-      <div className="text-white text-2xl md:text-6xl font-bold text-center">
-   
+      <div className="text-white font-bold text-center">
         {connected ? (
           <ActiveCallDetail
             assistantIsSpeaking={assistantIsSpeaking}
