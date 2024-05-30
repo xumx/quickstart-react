@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
 import ActiveCallDetail from "./components/ActiveCallDetail";
-import Button from "./components/base/Button";
+// import Button from "./components/base/Button";
+import { Button } from "./components/ui/MovingBorder"
+import { Vortex } from "./components/ui/Vortex";
 import Vapi from "@vapi-ai/web";
 import { isPublicKeyMissingError } from "./utils";
 
@@ -67,40 +69,37 @@ const App = () => {
     vapi.stop();
   };
 
+  // startCallInline("51b6b26e-b9eb-4bf2-adfc-21181018caea")
+  // isLoading={connecting}
+  
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100vw",
-        height: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <div className="mx-auto h-screen overflow-hidden">
+    <Vortex
+      rangeY={800}
+      baseHue={120}
+      backgroundColor="black"
+      className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen"
     >
-      
+      <h2 className="text-white text-2xl md:text-6xl font-bold text-center">
+   
+        {connected ? (
+          <ActiveCallDetail
+            assistantIsSpeaking={assistantIsSpeaking}
+            volumeLevel={volumeLevel}
+            onEndCallClick={endCall}
+          />
+        ): (
+          <Button onClick={() => startCallInline("4ce4d519-6c69-486e-868a-81ee628f199f")}>
+            Start Call
+          </Button>
+        )
+        }
 
-      {connected ? (
-        <ActiveCallDetail
-          assistantIsSpeaking={assistantIsSpeaking}
-          volumeLevel={volumeLevel}
-          onEndCallClick={endCall}
-        />
-      ): (<div>
-        <Button
-          label="Call Clinic"
-          onClick={() => startCallInline("4ce4d519-6c69-486e-868a-81ee628f199f")}
-          isLoading={connecting}
-        />
-        <br></br>
-        <Button
-          label="Call Olinqua"
-          onClick={() => startCallInline("51b6b26e-b9eb-4bf2-adfc-21181018caea")}
-          isLoading={connecting}
-        />
-      </div>)}
+        
+      </h2>
+    </Vortex>
+  </div>   
 
-      {showPublicKeyInvalidMessage ? <PleaseSetYourPublicKeyMessage /> : null}
-    </div>
   );
 };
 
