@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Vortex = void 0;
 var jsx_runtime_1 = require("react/jsx-runtime");
