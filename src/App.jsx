@@ -65,12 +65,13 @@ const App = () => {
   
   return (
     <div className="mx-auto h-screen overflow-hidden">
-    <Vortex
+    {/* <Vortex
       rangeY={800}
       baseHue={120}
       backgroundColor="black"
       className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen"
-    >
+    > */}
+    <div className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen">
       <div className="text-white font-bold text-center">
         {connected ? (
           <ActiveCallDetail
@@ -84,10 +85,9 @@ const App = () => {
         </Button>) : (<Button>Connecting...</Button>)
         )
         }
-
-        
-      </div>
-    </Vortex>
+      </div>  
+    </div>
+    {/* </Vortex> */}
   </div>   
 
   );
