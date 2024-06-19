@@ -32,7 +32,7 @@ const Button = ({ label, onClick, isLoading, disabled }) => {
         transition: "all 0.3s ease",
         opacity,
         cursor,
-        minWidth: "150px",
+        minWidth: "250px",
         margin: "20px"
       }}
     >

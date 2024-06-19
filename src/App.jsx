@@ -62,15 +62,19 @@ const App = () => {
 
   // startCallInline("51b6b26e-b9eb-4bf2-adfc-21181018caea")
   // isLoading={connecting}
-  
+  const assistants = {
+    "Clinic":"4ce4d519-6c69-486e-868a-81ee628f199f",
+    "After Hours Hotline": "520bd53a-233f-4d55-b574-3caab7e967b7"
+  }
+
   return (
     <div className="mx-auto h-screen overflow-hidden">
-    {/* <Vortex
+    <Vortex
       rangeY={800}
       baseHue={120}
       backgroundColor="black"
       className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen"
-    > */}
+    >
     <div className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen">
       <div className="text-white font-bold text-center">
         {connected ? (
@@ -80,14 +84,18 @@ const App = () => {
             onEndCallClick={endCall}
           />
         ): (
-          !connecting ? (<Button onClick={() => startCallInline("4ce4d519-6c69-486e-868a-81ee628f199f")}>
-          Start Call
-        </Button>) : (<Button>Connecting...</Button>)
+          !connecting ? (<><Button onClick={() => startCallInline(assistants["Clinic"])}>
+          Call Clinic
+        </Button><br/><br/>
+        <Button onClick={() => startCallInline(assistants["After Hours Hotline"])}>
+        Call 13Sick Hotline
+      </Button>
+          </>) : (<Button>Connecting...</Button>)
         )
         }
       </div>  
     </div>
-    {/* </Vortex> */}
+    </Vortex>
   </div>   
 
   );
