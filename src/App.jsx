@@ -9,6 +9,9 @@ import Vapi from "@vapi-ai/web";
 // Put your Vapi Public Key below.
 const vapi = new Vapi("ed768954-311b-4532-920d-ff3a635c3e8f");
 
+const selected = window.location.pathname.replace("/","") || "epica";
+console.log(selected)
+
 const App = () => {
   const [connecting, setConnecting] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -76,10 +79,6 @@ const App = () => {
   //   console.log(assistants);
   // });
 
-  const selected = window.location.pathname.replace("/","") || "epica";
-  console.log(selected)
-
-  console.log(assistants[selected]);
   return (
     <div className="mx-auto h-screen overflow-hidden">
     {/* <Vortex
