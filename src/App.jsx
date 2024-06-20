@@ -68,7 +68,8 @@ const App = () => {
   let assistants = {
     "epica":"4ce4d519-6c69-486e-868a-81ee628f199f",
     "13sick": "520bd53a-233f-4d55-b574-3caab7e967b7",
-    "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369"
+    "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369",
+    "myhealth": "b39a60ae-d4bb-4862-9c43-67625036eb1d",
   }
 
   // console.log(assistants);
