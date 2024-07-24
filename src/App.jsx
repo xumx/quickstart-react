@@ -9,7 +9,7 @@ import Vapi from "@vapi-ai/web";
 // Put your Vapi Public Key below.
 const vapi = new Vapi("ed768954-311b-4532-920d-ff3a635c3e8f");
 
-const selected = window.location.pathname.replace("/","") || "epica";
+const selected = (window.location.pathname.replace("/","") || "epica").toLowerCase();
 console.log(selected)
 
 const App = () => {
@@ -66,10 +66,12 @@ const App = () => {
   // startCallInline("51b6b26e-b9eb-4bf2-adfc-21181018caea")
   // isLoading={connecting}
   let assistants = {
-    "epica":"4ce4d519-6c69-486e-868a-81ee628f199f",
+    "epica":"c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
     "13sick": "520bd53a-233f-4d55-b574-3caab7e967b7",
     "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369",
     "myhealth": "b39a60ae-d4bb-4862-9c43-67625036eb1d",
+    "posmalay": "9fba33d2-f3aa-47b4-9f12-9f4fdd39a0ff",
+    "sjmc": "c244e7ca-38d9-4f48-9e42-a72e5a69f68c",
   }
 
   // console.log(assistants);
