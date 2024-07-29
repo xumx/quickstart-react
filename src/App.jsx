@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import ActiveCallDetail from "./components/ActiveCallDetail";
 // import Button from "./components/base/Button";
 import { Button } from "./components/ui/MovingBorder"
-import { Vortex } from "./components/ui/Vortex";
 import Vapi from "@vapi-ai/web";
 
 // Put your Vapi Public Key below.
 const vapi = new Vapi("ed768954-311b-4532-920d-ff3a635c3e8f");
 
-const selected = (window.location.pathname.replace("/","") || "epica").toLowerCase();
+const selected = (window.location.pathname.replace("/","") || "KR Hospital").toLowerCase();
 console.log(selected)
 
 const App = () => {
@@ -66,6 +65,7 @@ const App = () => {
   // startCallInline("51b6b26e-b9eb-4bf2-adfc-21181018caea")
   // isLoading={connecting}
   let assistants = {
+    "kr hospital": "c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
     "epica":"c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
     "13sick": "520bd53a-233f-4d55-b574-3caab7e967b7",
     "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369",
@@ -84,12 +84,6 @@ const App = () => {
 
   return (
     <div className="mx-auto h-screen overflow-hidden">
-    {/* <Vortex
-      rangeY={800}
-      baseHue={120}
-      backgroundColor="black"
-      className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen"
-    > */}
     <div className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen">
       <div className="text-white font-bold text-center">
         {connected ? (
@@ -108,9 +102,7 @@ const App = () => {
         }
       </div>  
     </div>
-    {/* </Vortex> */}
   </div>   
-
   );
 };
 
