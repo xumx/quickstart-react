@@ -73,7 +73,8 @@ const App = () => {
     "posmalay": "9fba33d2-f3aa-47b4-9f12-9f4fdd39a0ff",
     "sjmc": "c244e7ca-38d9-4f48-9e42-a72e5a69f68c",
     "prudential": "1767f49b-5b6c-4488-a42f-42a25b8153e0",
-    "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae"
+    "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae",
+    "outbound": "921a6b10-491b-4789-b5a4-5f936e284504"
   }
 
   // console.log(assistants);
