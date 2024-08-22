@@ -11,6 +11,27 @@ const vapi = new Vapi("ed768954-311b-4532-920d-ff3a635c3e8f");
 const selected = (window.location.pathname.replace("/","") || "KR Hospital").toLowerCase();
 console.log(selected)
 
+const assistants = {
+  "kr hospital": "c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
+  "epica":"c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
+  "13sick": "520bd53a-233f-4d55-b574-3caab7e967b7",
+  "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369",
+  "myhealth": "b39a60ae-d4bb-4862-9c43-67625036eb1d",
+  "posmalay": "9fba33d2-f3aa-47b4-9f12-9f4fdd39a0ff",
+  "sjmc": "c244e7ca-38d9-4f48-9e42-a72e5a69f68c",
+  "prudential": "1767f49b-5b6c-4488-a42f-42a25b8153e0",
+  "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae",
+  "outbound": "921a6b10-491b-4789-b5a4-5f936e284504",
+  "preop":"a4afc764-7589-437f-969d-90e9b99c104e"
+}
+
+fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).then(list=> {
+  list.forEach(assistant => assistants[assistant.name.toLowercase()] = assistant.id)
+
+  console.log("Finish Loading other assistants");
+  console.log(assistants);
+});
+
 const App = () => {
   const [connecting, setConnecting] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -74,16 +95,11 @@ const App = () => {
     "sjmc": "c244e7ca-38d9-4f48-9e42-a72e5a69f68c",
     "prudential": "1767f49b-5b6c-4488-a42f-42a25b8153e0",
     "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae",
-    "outbound": "921a6b10-491b-4789-b5a4-5f936e284504"
+    "outbound": "921a6b10-491b-4789-b5a4-5f936e284504",
+    "preop":"a4afc764-7589-437f-969d-90e9b99c104e"
   }
 
-  // console.log(assistants);
-  // fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).then(list=> {
-  //   list.forEach(assistant => assistants[assistant.name.toLowercase()] = assistant.id)
 
-  //   console.log("Finish Loading other assistants");
-  //   console.log(assistants);
-  // });
 
   return (
     <div className="mx-auto h-screen overflow-hidden">
