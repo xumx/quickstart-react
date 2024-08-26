@@ -19,7 +19,8 @@ const assistants = {
   "prudential": "1767f49b-5b6c-4488-a42f-42a25b8153e0",
   "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae",
   "outbound": "921a6b10-491b-4789-b5a4-5f936e284504",
-  "preop":"a4afc764-7589-437f-969d-90e9b99c104e"
+  "preop":"a4afc764-7589-437f-969d-90e9b99c104e",
+  "takashi":"18d26f3a-2148-40c6-af84-50656c14e705"
 }
 
 fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).then(list=> {
