@@ -24,7 +24,7 @@ const assistants = {
 }
 
 fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).then(list=> {
-  list.forEach(assistant => assistants[assistant.name.toLowercase()] = assistant.id)
+  list.forEach(assistant => assistants[assistant.name.toLowerCase()] = assistant.id)
 
   console.log("Finish Loading other assistants");
   console.log(assistants);
