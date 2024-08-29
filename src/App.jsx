@@ -30,7 +30,7 @@ fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).
   console.log(assistants);
 });
 
-const selected = (window.location.pathname.replace("/","") || "KR Hospital").toLowerCase();
+const selected = decodeURIComponent((window.location.pathname.replace("/","") || "KR Hospital").toLowerCase());
 console.log(selected)
 
 const App = () => {
