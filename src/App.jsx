@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-
 import ActiveCallDetail from "./components/ActiveCallDetail";
-// import Button from "./components/base/Button";
 import { Button } from "./components/ui/MovingBorder"
 import Vapi from "@vapi-ai/web";
 
@@ -9,18 +7,7 @@ import Vapi from "@vapi-ai/web";
 const vapi = new Vapi("ed768954-311b-4532-920d-ff3a635c3e8f");
 
 const assistants = {
-  "kr hospital": "c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
-  "epica":"c3bbb50f-ee6e-4e72-9d08-584a71cd4562",
-  "13sick": "520bd53a-233f-4d55-b574-3caab7e967b7",
-  "olinqua": "ee4b70e7-f13a-4361-a659-a0a53fa64369",
-  "myhealth": "b39a60ae-d4bb-4862-9c43-67625036eb1d",
-  "posmalay": "9fba33d2-f3aa-47b4-9f12-9f4fdd39a0ff",
-  "sjmc": "c244e7ca-38d9-4f48-9e42-a72e5a69f68c",
-  "prudential": "1767f49b-5b6c-4488-a42f-42a25b8153e0",
-  "aia": "c4aae5da-fa55-4aab-b143-2d941a8e49ae",
-  "outbound": "921a6b10-491b-4789-b5a4-5f936e284504",
-  "preop":"a4afc764-7589-437f-969d-90e9b99c104e",
-  "takashi":"18d26f3a-2148-40c6-af84-50656c14e705"
+  "kira": "438a05de-9605-437d-9dbd-4282074730dc"
 }
 
 fetch("https://omni.keyreply.com/v1/api/voiceAssistants").then(res=>res.json()).then(list=> {
@@ -94,15 +81,19 @@ const App = () => {
     <div className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen">
       <div className="text-white font-bold text-center">
         {connected ? (
-          <ActiveCallDetail
-            assistantIsSpeaking={assistantIsSpeaking}
-            volumeLevel={volumeLevel}
-            onEndCallClick={endCall}
-          />
+          (selected?.toUpperCase() == "KIRA") ? (
+            <Button onClick={endCall} color="#FFFFFF">End Call</Button>
+          ) : (
+            <ActiveCallDetail
+              assistantIsSpeaking={assistantIsSpeaking}
+              volumeLevel={volumeLevel}
+              onEndCallClick={endCall}
+            />
+          )
         ): (
           !connecting ? (
           <Button onClick={() => startCallInline()}>
-          Call {selected.toUpperCase()}
+          <span style={{color: "#FFFFFF"}}>Listen to <span style={{color: "#37CFFF"}}>{selected.toUpperCase()}</span> in Action</span>
           </Button>
           ) : (<Button>Connecting...</Button>)
         )

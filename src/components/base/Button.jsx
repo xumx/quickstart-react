@@ -8,7 +8,7 @@ const Button = ({ label, onClick, isLoading, disabled }) => {
     <ScaleLoader
       color="#000"
       height={10}
-      width={2.5}
+      width={3}
       margin={0.5}
       loading={true}
       size={50}
@@ -32,7 +32,7 @@ const Button = ({ label, onClick, isLoading, disabled }) => {
         transition: "all 0.3s ease",
         opacity,
         cursor,
-        minWidth: "250px",
+        minWidth: "300px",
         margin: "20px"
       }}
     >

@@ -34,7 +34,7 @@ var react_1 = require("react");
 var cn_1 = require("../../utils/cn");
 function Button(_a) {
     var _b = _a.borderRadius, borderRadius = _b === void 0 ? "1.75rem" : _b, onClick = _a.onClick, children = _a.children, _c = _a.as, Component = _c === void 0 ? "button" : _c, containerClassName = _a.containerClassName, borderClassName = _a.borderClassName, duration = _a.duration, className = _a.className, otherProps = __rest(_a, ["borderRadius", "onClick", "children", "as", "containerClassName", "borderClassName", "duration", "className"]);
-    return ((0, jsx_runtime_1.jsxs)(Component, __assign({ className: (0, cn_1.cn)("bg-transparent relative text-xl  h-16 w-40 p-[1px] overflow-hidden ", containerClassName), style: {
+    return ((0, jsx_runtime_1.jsxs)(Component, __assign({ className: (0, cn_1.cn)("bg-transparent relative text-xl  h-16 w-60 p-[1px] overflow-hidden ", containerClassName), style: {
             borderRadius: borderRadius,
         } }, otherProps, { children: [(0, jsx_runtime_1.jsx)("div", { className: "absolute inset-0", style: { borderRadius: "calc(".concat(borderRadius, " * 0.96)") }, children: (0, jsx_runtime_1.jsx)(exports.MovingBorder, { duration: duration, rx: "30%", ry: "30%", children: (0, jsx_runtime_1.jsx)("div", { className: (0, cn_1.cn)("h-20 w-20 opacity-[0.8] bg-[radial-gradient(var(--sky-500)_40%,transparent_60%)]", borderClassName) }) }) }), (0, jsx_runtime_1.jsx)("button", { className: (0, cn_1.cn)("relative bg-slate-900/[0.8] border border-slate-800 backdrop-blur-xl text-white flex items-center justify-center w-full h-full text-sm antialiased", className), style: {
                     borderRadius: "calc(".concat(borderRadius, " * 0.96)"),
