@@ -114,6 +114,12 @@ const App = () => {
     if (assistantId) {
       setCallState(prev => ({ ...prev, connecting: true }));
       vapi.start(assistantId);
+
+      if (selected === "kira") {
+        setTimeout(() => {
+          setCallState({ connecting: false, connected: true });
+        }, 2500);
+      }
     } else {
       console.warn(`Assistant ID not found for "${selected}"`);
     }
