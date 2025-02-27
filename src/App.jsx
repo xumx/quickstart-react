@@ -143,7 +143,7 @@ const App = () => {
     return (
       <Button onClick={startCall}>
         <span style={{color: "#FFFFFF"}}>
-          Listen to <span style={{color: "#37CFFF"}}>{label}</span> in Action
+          Talk to <span style={{color: "#37CFFF"}}>{label}</span>
         </span>
       </Button>
     );
