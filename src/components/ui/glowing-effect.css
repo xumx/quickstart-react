@@ -1,0 +1,21 @@
+:root {
+  --black: #000;
+  --white: #fff;
+  --color-1: 0 100% 67%;  /* Red */
+  --color-2: 217 91% 60%; /* Blue */
+  --color-3: 272 91% 65%; /* Purple */
+  --color-4: 169 65% 42%; /* Green */
+  --color-5: 35 91% 61%;  /* Orange */
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.glow::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+}

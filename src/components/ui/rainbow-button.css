@@ -1,0 +1,23 @@
+:root {
+  --color-1: 0 100% 67%;  /* Red */
+  --color-2: 217 91% 60%; /* Blue */
+  --color-3: 272 91% 65%; /* Purple */
+  --color-4: 169 65% 42%; /* Green */
+  --color-5: 35 91% 61%;  /* Orange */
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-rainbow {
+  animation: rainbow 8s linear infinite;
+}

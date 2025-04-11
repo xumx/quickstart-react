@@ -1,0 +1,89 @@
+/* CPU Architecture Animation Styles */
+.cpu-architecture {
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.cpu-line-1 {
+  animation-name: moveAlongPath1;
+}
+
+.cpu-line-2 {
+  animation-name: moveAlongPath2;
+}
+
+.cpu-line-3 {
+  animation-name: moveAlongPath3;
+}
+
+.cpu-line-4 {
+  animation-name: moveAlongPath4;
+}
+
+.cpu-line-5 {
+  animation-name: moveAlongPath5;
+}
+
+.cpu-line-6 {
+  animation-name: moveAlongPath6;
+}
+
+.cpu-line-7 {
+  animation-name: moveAlongPath7;
+}
+
+.cpu-line-8 {
+  animation-name: moveAlongPath8;
+}
+
+@keyframes moveAlongPath1 {
+  0% { transform: translate(10px, 20px); }
+  50% { transform: translate(50px, 20px); }
+  100% { transform: translate(94.5px, 55px); }
+}
+
+@keyframes moveAlongPath2 {
+  0% { transform: translate(180px, 10px); }
+  50% { transform: translate(140px, 10px); }
+  100% { transform: translate(105.3px, 45px); }
+}
+
+@keyframes moveAlongPath3 {
+  0% { transform: translate(130px, 20px); }
+  50% { transform: translate(130px, 40px); }
+  100% { transform: translate(115px, 46.8px); }
+}
+
+@keyframes moveAlongPath4 {
+  0% { transform: translate(170px, 80px); }
+  50% { transform: translate(170px, 60px); }
+  100% { transform: translate(115px, 53.2px); }
+}
+
+@keyframes moveAlongPath5 {
+  0% { transform: translate(135px, 65px); }
+  33% { transform: translate(155px, 65px); }
+  66% { transform: translate(155px, 85px); }
+  100% { transform: translate(105.2px, 85px); }
+}
+
+@keyframes moveAlongPath6 {
+  0% { transform: translate(94.8px, 95px); }
+  100% { transform: translate(94.8px, 59px); }
+}
+
+@keyframes moveAlongPath7 {
+  0% { transform: translate(88px, 88px); }
+  25% { transform: translate(88px, 68px); }
+  50% { transform: translate(73px, 68px); }
+  75% { transform: translate(73px, 53px); }
+  100% { transform: translate(87px, 53px); }
+}
+
+@keyframes moveAlongPath8 {
+  0% { transform: translate(30px, 30px); }
+  33% { transform: translate(55px, 30px); }
+  66% { transform: translate(60px, 41.5px); }
+  100% { transform: translate(85px, 46.5px); }
+}
