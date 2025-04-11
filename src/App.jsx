@@ -145,16 +145,21 @@ const App = () => {
   };
 
   // Call handlers
-  const startCall = useCallback(() => {
+  const startCall = useCallback(async () => {
     const assistantId = assistants[selected];
     if (assistantId) {
       setCallState(prev => ({ ...prev, connecting: true }));
-      vapi.start(assistantId, {
+      
+      // Start the call and get the call object with ID
+      const call = await vapi.start(assistantId, {
         variableValues: {
           name: userEmail,
           email: userEmail
         }
       });
+      
+      // Get call ID from the call object
+      const callId = call?.id || 'unknown';
       
       // Track demo call start
       ReactGA.event({
@@ -201,12 +206,26 @@ const App = () => {
                         "value": selected
                       },
                       {
+                        "title": "Call ID",
+                        "value": callId
+                      },
+                      {
                         "title": "Time",
                         "value": new Date().toLocaleString()
                       },
                       {
                         "title": "Source",
                         "value": window.location.href
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ActionSet",
+                    "actions": [
+                      {
+                        "type": "Action.OpenUrl",
+                        "title": "Download Recording",
+                        "url": `https://dashboard.vapi.ai/calls/${callId}`
                       }
                     ]
                   }
@@ -264,7 +283,7 @@ const App = () => {
           />
         </div>
         <RainbowButton onClick={startCall} className="text-white">
-          Talk to <span className="text-[#37CFFF]">{label}</span>
+          Talk to <span className="text-[#37CFFF]" style={{ paddingLeft: '4px' }}>{label}</span>
         </RainbowButton>
       </div>
     );
