@@ -273,7 +273,7 @@ const App = () => {
     const label = selected === "kira" ? "kira™" : selected.toUpperCase();
     return (
       <div className="relative">
-        <div className="w-[200px] h-[100px] mx-auto mb-4">
+        <div className="w-[250px] h-[100px] mx-auto mb-4">
           <CpuArchitecture 
             text={"Kira™"}
             animateText={true}
@@ -283,7 +283,7 @@ const App = () => {
           />
         </div>
         <RainbowButton onClick={startCall} className="text-white">
-          Talk to <span className="text-[#37CFFF]" style={{ paddingLeft: '4px' }}>{label}</span>
+          <span className="text-[#37CFFF]">{label}</span>
         </RainbowButton>
       </div>
     );
