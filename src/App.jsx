@@ -172,79 +172,81 @@ const App = () => {
       ReactGA.gtag('set', 'assistant_name', selected);
       console.log("Call start event sent to GA:", userEmail, selected);
       
-      // Send notification to Microsoft Teams webhook
-      fetch('https://prod-184.westus.logic.azure.com:443/workflows/8ac9ed7498a04a98bd399619d53761e1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TgZkQtNjUUQiL4v4nvAieMZ1wXi6ZBp_spqKc3IBaXQ', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "type": "message",
-          "attachments": [
-            {
-              "contentType": "application/vnd.microsoft.card.adaptive",
-              "content": {
-                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                "type": "AdaptiveCard",
-                "version": "1.2",
-                "body": [
-                  {
-                    "type": "TextBlock",
-                    "size": "Medium",
-                    "weight": "Bolder",
-                    "text": "🎙️ New Voice Demo Call Started"
-                  },
-                  {
-                    "type": "FactSet",
-                    "facts": [
-                      {
-                        "title": "Email",
-                        "value": userEmail
-                      },
-                      {
-                        "title": "Assistant",
-                        "value": selected
-                      },
-                      {
-                        "title": "Call ID",
-                        "value": callId
-                      },
-                      {
-                        "title": "Time",
-                        "value": new Date().toLocaleString()
-                      },
-                      {
-                        "title": "Source",
-                        "value": window.location.href
-                      }
-                    ]
-                  },
-                  {
-                    "type": "ActionSet",
-                    "actions": [
-                      {
-                        "type": "Action.OpenUrl",
-                        "title": "Download Recording",
-                        "url": `https://dashboard.vapi.ai/calls/${callId}`
-                      }
-                    ]
-                  }
-                ]
+      if (!userEmail.includes("@keyreply.com")) {
+        // Send notification to Microsoft Teams webhook
+        fetch('https://prod-184.westus.logic.azure.com:443/workflows/8ac9ed7498a04a98bd399619d53761e1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TgZkQtNjUUQiL4v4nvAieMZ1wXi6ZBp_spqKc3IBaXQ', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "type": "AdaptiveCard",
+                  "version": "1.2",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Medium",
+                      "weight": "Bolder",
+                      "text": "🎙️ New Voice Demo Call Started"
+                    },
+                    {
+                      "type": "FactSet",
+                      "facts": [
+                        {
+                          "title": "Email",
+                          "value": userEmail
+                        },
+                        {
+                          "title": "Assistant",
+                          "value": selected
+                        },
+                        {
+                          "title": "Call ID",
+                          "value": callId
+                        },
+                        {
+                          "title": "Time",
+                          "value": new Date().toLocaleString()
+                        },
+                        {
+                          "title": "Source",
+                          "value": window.location.href
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ActionSet",
+                      "actions": [
+                        {
+                          "type": "Action.OpenUrl",
+                          "title": "Download Recording",
+                          "url": `https://dashboard.vapi.ai/calls/${callId}`
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          })
         })
-      })
-      .then(response => {
-        if (response.ok) {
-          console.log('Teams notification sent successfully');
-        } else {
-          console.error('Failed to send Teams notification:', response.status);
-        }
-      })
-      .catch(error => {
-        console.error('Error sending Teams notification:', error);
-      });
+        .then(response => {
+          if (response.ok) {
+            console.log('Teams notification sent successfully');
+          } else {
+            console.error('Failed to send Teams notification:', response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error sending Teams notification:', error);
+        });
+      }
 
       if (selected === "kira") {
         setTimeout(() => {
