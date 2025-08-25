@@ -29,7 +29,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovingBorder = exports.Button = void 0;
 var jsx_runtime_1 = require("react/jsx-runtime");
-var framer_motion_1 = require("framer-motion");
+var framer_motion_1 = require("motion");
 var react_1 = require("react");
 var cn_1 = require("../../utils/cn");
 function Button(_a) {

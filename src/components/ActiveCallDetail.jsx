@@ -1,5 +1,5 @@
 import AssistantSpeechIndicator from "./call/AssistantSpeechIndicator";
-import { Button } from "./ui/MovingBorder";
+import { Button } from "./ui/MovingBorder.tsx";
 import VolumeLevel from "./call/VolumeLevel";
 
 const ActiveCallDetail = ({ assistantIsSpeaking, volumeLevel, onEndCallClick }) => {
