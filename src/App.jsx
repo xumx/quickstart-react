@@ -43,7 +43,8 @@ const VAPI_PUBLIC_KEY_CHANGEBRIDGE = "5ffc3915-0259-4314-942c-616df3e79c8b";
 // Initial assistants mapping (store rich metadata)
 const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
-  "changebridge": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Change Bridge" }
+  "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
+  "changebridge": { id: "da1299b4-0fdb-475b-ab6d-b79dbf75a0cb", name: "Changebridge Medical Associates" }
 };
 
 
@@ -68,7 +69,7 @@ const App = () => {
   // Vapi instance depends on selected; manage with ref and effect
   const vapiRef = useRef(null);
   useEffect(() => {
-    const key = selected == "changebridge" ? VAPI_PUBLIC_KEY_CHANGEBRIDGE : VAPI_PUBLIC_KEY;
+    const key = selected.includes("changebridge") ? VAPI_PUBLIC_KEY_CHANGEBRIDGE : VAPI_PUBLIC_KEY;
     const v = new Vapi(key);
     vapiRef.current = v;
 
@@ -226,7 +227,7 @@ const App = () => {
       setCallState(prev => ({ ...prev, connecting: true }));
       try {
         // Start the call and get the call object with ID
-        const call = (selected == "changebridge") ? await startWorkflow(assistantId) : await startAssistant(assistantId);
+        const call = (selected == "changebridge-workflow") ? await startWorkflow(assistantId) : await startAssistant(assistantId);
         
         // Get call ID from the call object
         const callId = call?.id || 'unknown';
@@ -419,7 +420,7 @@ const App = () => {
             borderWidth={3}
           />
           <div className="mb-6 text-center">
-            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+            <h2 className="text-2xl tracking-tight text-white mb-2">
               {resolvedAssistantName || (selected === "kira" ? "kira™" : selected)}
             </h2>
             <p className="text-blue-300 text-sm">Experience the future of AI conversations</p>
