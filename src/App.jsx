@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import ReactGA from "react-ga4";
 import ActiveCallDetail from "./components/ActiveCallDetail";
 import { RainbowButton } from "./components/ui/rainbow-button";
@@ -7,6 +7,7 @@ import FlickeringBackground from "./components/FlickeringBackground";
 import { CpuArchitecture } from "./components/ui/cpu-architecture.jsx";
 import { GlowingEffect } from "./components/ui/glowing-effect";
 import Vapi from "@vapi-ai/web";
+import { slugify, findBestAssistantId } from "./lib/nameMatch";
 
 // Initialize Google Analytics
 ReactGA.initialize('G-ZZCN97TCYL', {
@@ -17,25 +18,34 @@ ReactGA.initialize('G-ZZCN97TCYL', {
   }
 });
 
-// Put your Vapi Public Key below.
-const VAPI_PUBLIC_KEY = "ed768954-311b-4532-920d-ff3a635c3e8f";
-const vapi = new Vapi(VAPI_PUBLIC_KEY);
-
-// Initial assistants mapping
-const initialAssistants = {
-  "kira": "438a05de-9605-437d-9dbd-4282074730dc"
-};
+// slugify and findBestAssistantId now imported from ./lib/nameMatch
 
 // Helper to safely get the selected assistant from URL
 const getSelectedAssistantFromUrl = () => {
   try {
-    const path = window.location.pathname.replace("/", "");
-    return path ? decodeURIComponent(path.toLowerCase()) : "kira";
+    // Take only the first non-empty segment for robustness: /foo/bar -> foo
+    const firstSegment = window.location.pathname
+      .split("/")
+      .filter(Boolean)[0] || "";
+    const raw = firstSegment ? decodeURIComponent(firstSegment) : "kira";
+    return slugify(raw) || "kira";
   } catch (error) {
     console.error("Error parsing URL parameter:", error);
     return "kira"; // Fallback to default
   }
 };
+
+
+// Put your Vapi Public Key below.
+const VAPI_PUBLIC_KEY = "ed768954-311b-4532-920d-ff3a635c3e8f";
+const VAPI_PUBLIC_KEY_CHANGEBRIDGE = "5ffc3915-0259-4314-942c-616df3e79c8b";
+
+// Initial assistants mapping (store rich metadata)
+const initialAssistants = {
+  "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
+  "changebridge": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Change Bridge" }
+};
+
 
 const App = () => {
   // State management
@@ -44,6 +54,8 @@ const App = () => {
     connecting: false,
     connected: false
   });
+  const [resolveError, setResolveError] = useState("");
+  const [assistantsLoading, setAssistantsLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(localStorage.getItem('userEmail') || '');
   const [assistantState, setAssistantState] = useState({
     isSpeaking: false,
@@ -53,9 +65,87 @@ const App = () => {
   // Get the selected assistant from URL
   const selected = getSelectedAssistantFromUrl();
 
+  // Vapi instance depends on selected; manage with ref and effect
+  const vapiRef = useRef(null);
+  useEffect(() => {
+    const key = selected == "changebridge" ? VAPI_PUBLIC_KEY_CHANGEBRIDGE : VAPI_PUBLIC_KEY;
+    const v = new Vapi(key);
+    vapiRef.current = v;
+
+    // Register event handlers on this instance
+    const handleCallStart = () => {
+      setCallState({ connecting: false, connected: true });
+    };
+    const handleCallEnd = () => {
+      setCallState({ connecting: false, connected: false });
+    };
+    const handleSpeechStart = () => {
+      setAssistantState(prev => ({ ...prev, isSpeaking: true }));
+    };
+    const handleSpeechEnd = () => {
+      setAssistantState(prev => ({ ...prev, isSpeaking: false }));
+    };
+    const handleVolumeLevel = (level) => {
+      setAssistantState(prev => ({ ...prev, volumeLevel: level }));
+    };
+    const handleError = (error) => {
+      console.error("Vapi error:", error);
+      setCallState({ connecting: false, connected: false });
+      // Prefer inline error over alert for UX; keep alert if you still want a popup
+      setResolveError("Connection error. Please try again.");
+    };
+
+    v.on("call-start", handleCallStart);
+    v.on("call-end", handleCallEnd);
+    v.on("speech-start", handleSpeechStart);
+    v.on("speech-end", handleSpeechEnd);
+    v.on("volume-level", handleVolumeLevel);
+    v.on("error", handleError);
+
+    return () => {
+      v.off("call-start", handleCallStart);
+      v.off("call-end", handleCallEnd);
+      v.off("speech-start", handleSpeechStart);
+      v.off("speech-end", handleSpeechEnd);
+      v.off("volume-level", handleVolumeLevel);
+      v.off("error", handleError);
+    };
+  }, [selected]);
+
+  // Build a derived map slug -> id for matching, keep assistants as rich metadata
+  const assistantIdMap = useMemo(() => {
+    const entries = Object.entries(assistants).map(([slug, meta]) => [slug, meta?.id]);
+    return Object.fromEntries(entries);
+  }, [assistants]);
+
+  // Compute resolved assistant ID (exact or fuzzy) and track error state
+  const resolvedAssistantId = useMemo(() => {
+    const id = assistantIdMap[selected] || findBestAssistantId(assistantIdMap, selected);
+    return id;
+  }, [assistantIdMap, selected]);
+
+  // Also compute resolved slug and name for UI/analytics
+  const resolvedAssistantSlug = useMemo(() => {
+    if (!resolvedAssistantId) return undefined;
+    return Object.entries(assistantIdMap).find(([, id]) => id === resolvedAssistantId)?.[0];
+  }, [assistantIdMap, resolvedAssistantId]);
+
+  const resolvedAssistantName = useMemo(() => {
+    return resolvedAssistantSlug ? assistants[resolvedAssistantSlug]?.name : undefined;
+  }, [assistants, resolvedAssistantSlug]);
+
+  useEffect(() => {
+    if (!resolvedAssistantId && !assistantsLoading) {
+      setResolveError("We couldn't find an assistant matching this URL.");
+    } else {
+      setResolveError("");
+    }
+  }, [resolvedAssistantId, assistantsLoading]);
+
   // Fetch additional assistants if not using the default "kira"
   useEffect(() => {
     if (selected !== "kira") {
+      setAssistantsLoading(true);
       fetch("https://omni.keyreply.com/v1/api/voiceAssistants")
         .then(res => {
           if (!res.ok) {
@@ -66,62 +156,20 @@ const App = () => {
         .then(list => {
           const newAssistants = { ...initialAssistants };
           list.forEach(assistant => {
-            newAssistants[assistant.name.trim().toLowerCase()] = assistant.id;
+            const key = slugify(assistant.name);
+            if (key) newAssistants[key] = { id: assistant.id, name: assistant.name };
           });
           setAssistants(newAssistants);
         })
         .catch(error => {
           console.error("Error fetching assistants:", error);
-        });
+          setResolveError("Couldn't load assistants. Please refresh or try again.");
+        })
+        .finally(() => setAssistantsLoading(false));
     }
   }, [selected]);
 
-  // Set up Vapi event listeners
-  useEffect(() => {
-    const handleCallStart = () => {
-      setCallState({ connecting: false, connected: true });
-    };
-    
-    const handleCallEnd = () => {
-      setCallState({ connecting: false, connected: false });
-    };
-    
-    const handleSpeechStart = () => {
-      setAssistantState(prev => ({ ...prev, isSpeaking: true }));
-    };
-    
-    const handleSpeechEnd = () => {
-      setAssistantState(prev => ({ ...prev, isSpeaking: false }));
-    };
-    
-    const handleVolumeLevel = (level) => {
-      setAssistantState(prev => ({ ...prev, volumeLevel: level }));
-    };
-    
-    const handleError = (error) => {
-      console.error("Vapi error:", error);
-      setCallState({ connecting: false, connected: false });
-      alert("Error connecting to server. Please check your network connection.");
-    };
-
-    // Register event handlers
-    vapi.on("call-start", handleCallStart);
-    vapi.on("call-end", handleCallEnd);
-    vapi.on("speech-start", handleSpeechStart);
-    vapi.on("speech-end", handleSpeechEnd);
-    vapi.on("volume-level", handleVolumeLevel);
-    vapi.on("error", handleError);
-
-    // Cleanup function to remove event listeners
-    return () => {
-      vapi.off("call-start", handleCallStart);
-      vapi.off("call-end", handleCallEnd);
-      vapi.off("speech-start", handleSpeechStart);
-      vapi.off("speech-end", handleSpeechEnd);
-      vapi.off("volume-level", handleVolumeLevel);
-      vapi.off("error", handleError);
-    };
-  }, []);
+  // (Legacy listener effect removed; listeners are now bound in the ref-based effect above.)
 
   // Track page view on component mount
   useEffect(() => {
@@ -144,22 +192,44 @@ const App = () => {
     console.log("Email submit event sent to GA:", email);
   };
 
+  const startWorkflow = async(workflowId) => {
+    const assistantId = null;
+    const overrides = null;
+    const squadId = null;
+    const vapi = vapiRef.current;
+    const call = await vapi.start(assistantId, overrides, squadId, workflowId, {
+      variableValues: {
+        name: userEmail,
+        email: userEmail
+      }
+    });
+
+    return call;
+  }
+
+  const startAssistant = async(assistantId) => {
+    const vapi = vapiRef.current;
+    const call = await vapi.start(assistantId, {
+      variableValues: {
+        name: userEmail,
+        email: userEmail
+      }
+    });
+
+    return call;
+  }
+
   // Call handlers
   const startCall = useCallback(async () => {
-    const assistantId = assistants[selected];
+    const assistantId = resolvedAssistantId;
     if (assistantId) {
       setCallState(prev => ({ ...prev, connecting: true }));
-      
-      // Start the call and get the call object with ID
-      const call = await vapi.start(assistantId, {
-        variableValues: {
-          name: userEmail,
-          email: userEmail
-        }
-      });
-      
-      // Get call ID from the call object
-      const callId = call?.id || 'unknown';
+      try {
+        // Start the call and get the call object with ID
+        const call = (selected == "changebridge") ? await startWorkflow(assistantId) : await startAssistant(assistantId);
+        
+        // Get call ID from the call object
+        const callId = call?.id || 'unknown';
       
       // Track demo call start
       ReactGA.event({
@@ -168,8 +238,8 @@ const App = () => {
         label: userEmail
       });
       
-      // Send custom dimension for assistant name
-      ReactGA.gtag('set', 'assistant_name', selected);
+      // Send custom dimension for assistant name (use resolved display name if available)
+      ReactGA.gtag('set', 'assistant_name', resolvedAssistantName || selected);
       console.log("Call start event sent to GA:", userEmail, selected);
       
       if (!userEmail.includes("@keyreply.com")) {
@@ -253,13 +323,21 @@ const App = () => {
           setCallState({ connecting: false, connected: true });
         }, 2500);
       }
+      } catch (err) {
+        console.error('Failed to start call:', err);
+        setCallState({ connecting: false, connected: false });
+        setResolveError('Failed to start call. Please try again.');
+        return;
+      }
     } else {
       console.warn(`Assistant ID not found for "${selected}"`);
+      setResolveError("Assistant not found. Please check the URL or try a different one.");
     }
-  }, [assistants, selected, userEmail]);
+  }, [resolvedAssistantId, selected, userEmail]);
 
   const endCall = useCallback(() => {
-    vapi.stop();
+    const vapi = vapiRef.current;
+    if (vapi) vapi.stop();
   }, []);
 
   // Render helper functions for cleaner JSX
@@ -269,10 +347,19 @@ const App = () => {
     }
     
     if (callState.connecting) {
-      return <RainbowButton className="text-white">Connecting...</RainbowButton>;
+      return (
+        <RainbowButton className="text-white" disabled aria-busy="true" aria-live="polite">
+          <span className="inline-flex items-center gap-2">
+            <span className="rainbow-spinner h-5 w-5" aria-hidden="true" />
+            <span className="animate-pulse rainbow-text">Connecting...</span>
+          </span>
+        </RainbowButton>
+      );
     }
     
-    const label = selected === "kira" ? "kira™" : selected.toUpperCase();
+    const labelBase = resolvedAssistantName || selected;
+    const label = "Start Call";
+    const canCall = Boolean(resolvedAssistantId);
     return (
       <div className="relative">
         <div className="w-[250px] h-[100px] mx-auto mb-4">
@@ -284,9 +371,19 @@ const App = () => {
             showCpuConnections={true}
           />
         </div>
-        <RainbowButton onClick={startCall} className="text-white">
-          <span className="text-[#37CFFF]">{label}</span>
+        <RainbowButton
+          onClick={canCall ? startCall : undefined}
+          disabled={!canCall}
+          aria-disabled={!canCall}
+          className={`text-white ${!canCall ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          <span className="text-white font-semibold">{label}</span>
         </RainbowButton>
+        {!canCall && !assistantsLoading && (
+          <div className="mt-3 text-sm text-red-400">
+            {resolveError || "Assistant not found for this URL."}
+          </div>
+        )}
       </div>
     );
   };
@@ -322,8 +419,10 @@ const App = () => {
             borderWidth={3}
           />
           <div className="mb-6 text-center">
-            <h2 className="text-3xl font-bold text-white mb-2">AI Voice Assistant</h2>
-            <p className="text-blue-300 text-sm">Experience the future of conversation</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2">
+              {resolvedAssistantName || (selected === "kira" ? "kira™" : selected)}
+            </h2>
+            <p className="text-blue-300 text-sm">Experience the future of AI conversations</p>
           </div>
           <div className="text-white font-bold text-center">
             {renderCallInterface()}

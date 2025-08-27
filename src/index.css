@@ -3,7 +3,7 @@
 body {
   margin: 0;
   background-color: transparent !important;
-  font-family: "Inter", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+  font-family: "Plus Jakarta Sans", "Inter", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -12,4 +12,63 @@ body {
 p {
   margin: 0;
   padding: 0;
+}
+
+/* Sharper hero headings */
+h1,
+h2 {
+  font-weight: 800; /* extra-bold */
+  letter-spacing: -0.02em; /* tracking-tight equivalent */
+}
+h1 {
+  line-height: 1.1;
+}
+h2 {
+  line-height: 1.15;
+}
+
+/* Rainbow spinner (conic gradient) */
+.rainbow-spinner {
+  background: conic-gradient(
+    hsl(0 100% 67%),
+    hsl(217 91% 60%),
+    hsl(272 91% 65%),
+    hsl(169 65% 42%),
+    hsl(35 91% 61%),
+    hsl(0 100% 67%)
+  );
+  border-radius: 9999px;
+  /* Create a hollow center */
+  -webkit-mask: radial-gradient(farthest-side, transparent 55%, #000 56%);
+  mask: radial-gradient(farthest-side, transparent 55%, #000 56%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rainbow,
+  .animate-spin,
+  .animate-pulse,
+  .rainbow-spinner {
+    animation: none !important;
+  }
+}
+
+/* Rainbow gradient text utility */
+.rainbow-text {
+  background: linear-gradient(
+    90deg,
+    hsl(0 100% 67%),
+    hsl(217 91% 60%),
+    hsl(272 91% 65%),
+    hsl(169 65% 42%),
+    hsl(35 91% 61%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
