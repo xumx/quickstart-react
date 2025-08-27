@@ -66,7 +66,7 @@ const App = () => {
         .then(list => {
           const newAssistants = { ...initialAssistants };
           list.forEach(assistant => {
-            newAssistants[assistant.name.toLowerCase()] = assistant.id;
+            newAssistants[assistant.name.trim().toLowerCase()] = assistant.id;
           });
           setAssistants(newAssistants);
         })
