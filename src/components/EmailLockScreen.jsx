@@ -33,8 +33,7 @@ const EmailLockScreen = ({ onSubmit }) => {
           borderWidth={3}
         />
         <div className="mb-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2">KeyReply Voice Demo</h2>
-          <p className="text-blue-300 text-sm">Enter your email to continue</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">Voice AI Demo</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -45,7 +44,7 @@ const EmailLockScreen = ({ onSubmit }) => {
                 setEmail(e.target.value);
                 setError('');
               }}
-              placeholder="Enter your email address"
+              placeholder="Please enter your email address"
               className="w-full p-4 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 placeholder:text-gray-400"
             />
             {error && <p className="text-red-400 mt-2 text-sm">{error}</p>}

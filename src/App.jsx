@@ -136,7 +136,7 @@ const App = () => {
 
   useEffect(() => {
     if (!resolvedAssistantId && !assistantsLoading) {
-      setResolveError("We couldn't find an assistant matching this URL.");
+      setResolveError("There is no assistant matching this URL.");
     } else {
       setResolveError("");
     }
@@ -408,8 +408,8 @@ const App = () => {
     <div className="mx-auto h-screen overflow-hidden">
       {!userEmail && <EmailLockScreen onSubmit={handleEmailSubmit} />}
       <FlickeringBackground />
-      <div className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-screen relative z-10">
-        <div className="relative bg-gray-900 bg-opacity-60 p-8 rounded-xl border border-gray-700 shadow-2xl backdrop-blur-sm max-w-md w-full">
+      <div className="flex items-center flex-col justify-center px-2 md:px-8 py-8 w-full h-screen relative z-10">
+        <div className="relative bg-gray-900 bg-opacity-60 p-4 rounded-xl border border-gray-700 shadow-2xl backdrop-blur-sm max-w-lg w-full">
           <GlowingEffect
             spread={40}
             glow={true}
@@ -419,7 +419,7 @@ const App = () => {
             borderWidth={3}
           />
           <div className="mb-6 text-center">
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2">
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
               {resolvedAssistantName || (selected === "kira" ? "kira™" : selected)}
             </h2>
             <p className="text-blue-300 text-sm">Experience the future of AI conversations</p>
