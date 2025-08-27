@@ -45,7 +45,7 @@ const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
-  "changebridge": { id: "da1299b4-0fdb-475b-ab6d-b79dbf75a0cb", name: "Changebridge Medical Associates" }
+  "changebridge": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" }
 };
 
 
