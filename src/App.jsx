@@ -54,7 +54,7 @@ const initialAssistants = {
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
   "changebridge": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
-  "careshield": { id: "413e971a-ee4f-4b6b-a029-4de6d05862bf", name: "Careshield" }
+  "careshield-appointment": { id: "413e971a-ee4f-4b6b-a029-4de6d05862bf", name: "Careshield Appointment" }
 };
 
 
@@ -79,7 +79,7 @@ const App = () => {
   // Vapi instance depends on selected; manage with ref and effect
   const vapiRef = useRef(null);
   useEffect(() => {
-    const key = selected.includes("changebridge") ? VAPI_API_KEYS.changebridge : (selected.includes("careshield") ? VAPI_API_KEYS.careshield : VAPI_API_KEYS.default);
+    const key = selected.includes("changebridge") ? VAPI_API_KEYS.changebridge : (selected.includes("careshield-appointment") ? VAPI_API_KEYS.careshield : VAPI_API_KEYS.default);
     const v = new Vapi(key);
     vapiRef.current = v;
 
