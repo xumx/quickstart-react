@@ -39,13 +39,22 @@ const getSelectedAssistantFromUrl = () => {
 // Put your Vapi Public Key below.
 const VAPI_PUBLIC_KEY = "ed768954-311b-4532-920d-ff3a635c3e8f";
 const VAPI_PUBLIC_KEY_CHANGEBRIDGE = "5ffc3915-0259-4314-942c-616df3e79c8b";
+const VAPI_PUBLIC_KEY_CARESHIELD = "f4b0d582-8723-4111-b354-c5e7bbe3a227"; // Galaxy
+
+const VAPI_API_KEYS = {
+  default: VAPI_PUBLIC_KEY,
+  careshield: VAPI_PUBLIC_KEY_CARESHIELD,
+  changebridge: VAPI_PUBLIC_KEY_CHANGEBRIDGE,
+}
 
 // Initial assistants mapping (store rich metadata)
 const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
+  "changebridge-dev": { id: "a212d3f9-0586-4608-ba53-dbae8b9a30a1", name: "Changebridge Medical Associates" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
-  "changebridge": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" }
+  "changebridge": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
+  "careshield": { id: "413e971a-ee4f-4b6b-a029-4de6d05862bf", name: "Careshield" }
 };
 
 
@@ -70,7 +79,7 @@ const App = () => {
   // Vapi instance depends on selected; manage with ref and effect
   const vapiRef = useRef(null);
   useEffect(() => {
-    const key = selected.includes("changebridge") ? VAPI_PUBLIC_KEY_CHANGEBRIDGE : VAPI_PUBLIC_KEY;
+    const key = selected.includes("changebridge") ? VAPI_API_KEYS.changebridge : (selected.includes("careshield") ? VAPI_API_KEYS.careshield : VAPI_API_KEYS.default);
     const v = new Vapi(key);
     vapiRef.current = v;
 
