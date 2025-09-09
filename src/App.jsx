@@ -39,9 +39,9 @@ const getSelectedAssistantFromUrl = () => {
 // Put your Vapi Public Key below.
 const VAPI_PUBLIC_KEY = "ed768954-311b-4532-920d-ff3a635c3e8f";
 const VAPI_PUBLIC_KEY_CHANGEBRIDGE = "5ffc3915-0259-4314-942c-616df3e79c8b";
-const VAPI_PUBLIC_KEY_CARESHIELD = "f4b0d582-8723-4111-b354-c5e7bbe3a227"; // Galaxy
+const VAPI_PUBLIC_KEY_CARESHIELD = "bf992655-3c63-4660-bea2-b10e832142ba"; // Galaxy Public Key
 
-const VAPI_API_KEYS = {
+const VAPI_PUBLIC_KEYS = {
   default: VAPI_PUBLIC_KEY,
   careshield: VAPI_PUBLIC_KEY_CARESHIELD,
   changebridge: VAPI_PUBLIC_KEY_CHANGEBRIDGE,
@@ -79,7 +79,7 @@ const App = () => {
   // Vapi instance depends on selected; manage with ref and effect
   const vapiRef = useRef(null);
   useEffect(() => {
-    const key = selected.includes("changebridge") ? VAPI_API_KEYS.changebridge : (selected.includes("careshield-appointment") ? VAPI_API_KEYS.careshield : VAPI_API_KEYS.default);
+    const key = selected.includes("changebridge") ? VAPI_PUBLIC_KEYS.changebridge : (selected.includes("careshield-appointment") ? VAPI_PUBLIC_KEYS.careshield : VAPI_PUBLIC_KEYS.default);
     const v = new Vapi(key);
     vapiRef.current = v;
 
