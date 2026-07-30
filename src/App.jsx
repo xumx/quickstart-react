@@ -157,7 +157,7 @@ const App = () => {
   useEffect(() => {
     if (selected !== "kira") {
       setAssistantsLoading(true);
-      fetch("https://omni.keyreply.com/v1/api/voiceAssistants")
+      fetch("/voice-assistants.json")
         .then(res => {
           if (!res.ok) {
             throw new Error(`Failed to fetch assistants: ${res.status}`);
