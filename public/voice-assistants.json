@@ -1,10 +1,34 @@
 [
   {
+    "name": "TMOneDemoEnglish",
+    "id": "6be6f37f-5d02-46e3-951d-033fb8877109"
+  },
+  {
+    "name": "TMOneDemoMalay",
+    "id": "6ad05146-25c9-4850-8a75-44cc6bf4a049"
+  },
+  {
+    "name": "Atlètico Madrid",
+    "id": "59b6ba99-8655-48e9-a957-882b9e71ffce"
+  },
+  {
+    "name": "Ivy Rehab Outbound v2",
+    "id": "e49d3afa-0757-4092-8260-24571a870213"
+  },
+  {
+    "name": "SCHDemo_Cantonese",
+    "id": "a6552a12-d656-4631-961e-b0620d9e6b6a"
+  },
+  {
+    "name": "SCHDemo",
+    "id": "5114a311-975b-44d3-9a9d-e82652c113bd"
+  },
+  {
     "name": "MPHDemo",
     "id": "b4405c1d-c0c4-4d9e-b1ed-2229732edc44"
   },
   {
-    "name": "Hornets outbound (Copy)",
+    "name": "Sports kit build",
     "id": "bfa288ee-97e8-4dc2-8998-97b33dca8805"
   },
   {
