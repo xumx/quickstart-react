@@ -48,8 +48,20 @@ const VAPI_PUBLIC_KEYS = {
 }
 
 // Initial assistants mapping (store rich metadata)
+//
+// Also acts as the override layer for assistants renamed in Vapi since the last
+// voice-assistants.json refresh. That refresh is a full regenerate and does pick
+// renames up, but it only runs every few days and needs a deploy, so a freshly
+// renamed assistant 404s until it catches up. Add an entry here to unblock a
+// demo link immediately; it can be dropped once the snapshot has the new name.
 const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
+  // One assistant, renamed twice ahead of the snapshot: "Hornets outbound (Copy)"
+  // -> "Sports kit build" (in the snapshot) -> "BOA Agent" / "Panthers" (not yet).
+  // All four spellings resolve so whichever link is already out there works.
+  "boa-agent": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "BOA Agent" },
+  "panthers": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "Panthers" },
+  "carolina-panthers": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "Panthers" },
   "changebridge-dev": { id: "a212d3f9-0586-4608-ba53-dbae8b9a30a1", name: "Changebridge Medical Associates" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
@@ -138,8 +150,12 @@ const App = () => {
   // Also compute resolved slug and name for UI/analytics
   const resolvedAssistantSlug = useMemo(() => {
     if (!resolvedAssistantId) return undefined;
+    // Prefer the slug that was actually requested. Several slugs can point at one
+    // assistant (an alias plus its stale snapshot name), and the reverse lookup
+    // below would otherwise show whichever happens to come first in the map.
+    if (assistantIdMap[selected] === resolvedAssistantId) return selected;
     return Object.entries(assistantIdMap).find(([, id]) => id === resolvedAssistantId)?.[0];
-  }, [assistantIdMap, resolvedAssistantId]);
+  }, [assistantIdMap, resolvedAssistantId, selected]);
 
   const resolvedAssistantName = useMemo(() => {
     return resolvedAssistantSlug ? assistants[resolvedAssistantSlug]?.name : undefined;
