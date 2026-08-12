@@ -20,6 +20,10 @@ ReactGA.initialize('G-ZZCN97TCYL', {
 
 // slugify and findBestAssistantId now imported from ./lib/nameMatch
 
+// slugify leaves a UUID untouched (lowercase hex and dashes only), so a raw
+// assistant ID in the URL survives to the lookup and can be used directly.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
 // Helper to safely get the selected assistant from URL
 const getSelectedAssistantFromUrl = () => {
   try {
@@ -56,12 +60,16 @@ const VAPI_PUBLIC_KEYS = {
 // demo link immediately; it can be dropped once the snapshot has the new name.
 const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
-  // One assistant, renamed twice ahead of the snapshot: "Hornets outbound (Copy)"
-  // -> "Sports kit build" (in the snapshot) -> "BOA Agent" / "Panthers" (not yet).
-  // All four spellings resolve so whichever link is already out there works.
+  // Renamed from "Hornets outbound (Copy)" -> "Sports kit build" (the name still
+  // in the snapshot) -> "BOA Agent". Drop once the snapshot has the new name.
+  //
+  // Only ever alias a name to an ID when that name belongs to that assistant and
+  // nothing else. "panthers" was aliased here too, while Panthers was still just
+  // another name for this assistant; a separate Panthers assistant was then
+  // created and the alias silently sent its link to this one instead. An alias
+  // outranks nothing -- it is only consulted because the snapshot is stale -- so
+  // a wrong one is invisible until someone notices the voice is off.
   "boa-agent": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "BOA Agent" },
-  "panthers": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "Panthers" },
-  "carolina-panthers": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "Panthers" },
   "changebridge-dev": { id: "a212d3f9-0586-4608-ba53-dbae8b9a30a1", name: "Changebridge Medical Associates" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
@@ -143,6 +151,11 @@ const App = () => {
 
   // Compute resolved assistant ID (exact or fuzzy) and track error state
   const resolvedAssistantId = useMemo(() => {
+    // A raw assistant ID in the URL is used as-is. voice-assistants.json only
+    // refreshes every few days, so a newly created or renamed assistant has no
+    // slug until it catches up; an ID link works the moment the assistant exists
+    // and can never point at the wrong one.
+    if (UUID_RE.test(selected)) return selected;
     const id = assistantIdMap[selected] || findBestAssistantId(assistantIdMap, selected);
     return id;
   }, [assistantIdMap, selected]);
@@ -447,7 +460,8 @@ const App = () => {
           />
           <div className="mb-6 text-center">
             <h2 className="text-2xl tracking-tight text-white mb-2">
-              {resolvedAssistantName || (selected === "kira" ? "kira™" : selected)}
+              {resolvedAssistantName
+                || (selected === "kira" ? "kira™" : (UUID_RE.test(selected) ? "Voice Demo" : selected))}
             </h2>
             <p className="text-blue-300 text-sm">Experience the future of AI conversations</p>
           </div>
