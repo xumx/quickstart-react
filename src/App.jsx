@@ -136,6 +136,24 @@ const App = () => {
     v.on("volume-level", handleVolumeLevel);
     v.on("error", handleError);
 
+    // Detaching the listeners below stops the app hearing the call; it does not
+    // end it. Without this the WebRTC session survives leaving the page and
+    // keeps playing audio, which is heard as a stuck murmur, or as a previous
+    // assistant talking over the next one's greeting.
+    const stopCall = () => {
+      try {
+        v.stop();
+      } catch (error) {
+        // Nothing in flight, or the session is already torn down.
+        console.warn("Vapi stop failed (likely no active call):", error);
+      }
+    };
+
+    // pagehide, not beforeunload: iOS Safari does not reliably fire
+    // beforeunload, and this is the case that matters on a phone. It does not
+    // fire on app switch, so backgrounding mid-call does not hang up.
+    window.addEventListener("pagehide", stopCall);
+
     return () => {
       v.off("call-start", handleCallStart);
       v.off("call-end", handleCallEnd);
@@ -143,6 +161,8 @@ const App = () => {
       v.off("speech-end", handleSpeechEnd);
       v.off("volume-level", handleVolumeLevel);
       v.off("error", handleError);
+      window.removeEventListener("pagehide", stopCall);
+      stopCall();
     };
   }, [selected]);
 
