@@ -73,6 +73,11 @@ const initialAssistants = {
   // Created after the Aug 11 refresh, so the snapshot has no entry for it. This
   // is a different assistant from BOA Agent above -- same demo, separate agent.
   "panthers": { id: "a2cde3f8-4d00-4460-9712-ee9167e31b99", name: "Panthers" },
+  // Published after the Aug 14 refresh, so the snapshot has no entry for it.
+  // Temporary: drop this once /api/assistants is live, or once a refresh picks
+  // the name up. Same caution as above -- if "luna" is ever reused for a
+  // different assistant, this alias sends its link here instead.
+  "luna": { id: "49615404-043d-45f6-88ab-a502ea287f65", name: "luna" },
   "changebridge-dev": { id: "a212d3f9-0586-4608-ba53-dbae8b9a30a1", name: "Changebridge Medical Associates" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
