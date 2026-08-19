@@ -207,29 +207,52 @@ const App = () => {
 
   // Fetch additional assistants if not using the default "kira"
   useEffect(() => {
-    if (selected !== "kira") {
-      setAssistantsLoading(true);
-      fetch("/voice-assistants.json")
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`Failed to fetch assistants: ${res.status}`);
-          }
-          return res.json();
-        })
-        .then(list => {
-          const newAssistants = { ...initialAssistants };
-          list.forEach(assistant => {
-            const key = slugify(assistant.name);
-            if (key) newAssistants[key] = { id: assistant.id, name: assistant.name };
-          });
-          setAssistants(newAssistants);
-        })
-        .catch(error => {
-          console.error("Error fetching assistants:", error);
-          setResolveError("Couldn't load assistants. Please refresh or try again.");
-        })
-        .finally(() => setAssistantsLoading(false));
-    }
+    if (selected === "kira") return;
+
+    let cancelled = false;
+    setAssistantsLoading(true);
+
+    // /api/assistants reads from Vapi at request time, so an assistant created
+    // or renamed minutes ago already resolves. voice-assistants.json is the
+    // fallback for when that route is unavailable: it is a hand-refreshed
+    // snapshot, days stale by the time anyone notices, and the reason a
+    // published assistant can report "no assistant matching this URL".
+    const loadList = async () => {
+      try {
+        const live = await fetch("/api/assistants");
+        if (live.ok) return await live.json();
+        console.warn(`Live assistant lookup unavailable (${live.status}); using snapshot.`);
+      } catch (error) {
+        console.warn("Live assistant lookup failed; using snapshot.", error);
+      }
+
+      const snapshot = await fetch("/voice-assistants.json");
+      if (!snapshot.ok) {
+        throw new Error(`Failed to fetch assistants: ${snapshot.status}`);
+      }
+      return await snapshot.json();
+    };
+
+    loadList()
+      .then(list => {
+        if (cancelled) return;
+        const newAssistants = { ...initialAssistants };
+        list.forEach(assistant => {
+          const key = slugify(assistant.name);
+          if (key) newAssistants[key] = { id: assistant.id, name: assistant.name };
+        });
+        setAssistants(newAssistants);
+      })
+      .catch(error => {
+        if (cancelled) return;
+        console.error("Error fetching assistants:", error);
+        setResolveError("Couldn't load assistants. Please refresh or try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setAssistantsLoading(false);
+      });
+
+    return () => { cancelled = true; };
   }, [selected]);
 
   // (Legacy listener effect removed; listeners are now bound in the ref-based effect above.)
