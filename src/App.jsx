@@ -20,6 +20,10 @@ ReactGA.initialize('G-ZZCN97TCYL', {
 
 // slugify and findBestAssistantId now imported from ./lib/nameMatch
 
+// slugify leaves a UUID untouched (lowercase hex and dashes only), so a raw
+// assistant ID in the URL survives to the lookup and can be used directly.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
 // Helper to safely get the selected assistant from URL
 const getSelectedAssistantFromUrl = () => {
   try {
@@ -48,8 +52,32 @@ const VAPI_PUBLIC_KEYS = {
 }
 
 // Initial assistants mapping (store rich metadata)
+//
+// Also acts as the override layer for assistants renamed in Vapi since the last
+// voice-assistants.json refresh. That refresh is a full regenerate and does pick
+// renames up, but it only runs every few days and needs a deploy, so a freshly
+// renamed assistant 404s until it catches up. Add an entry here to unblock a
+// demo link immediately; it can be dropped once the snapshot has the new name.
 const initialAssistants = {
   "kira": { id: "438a05de-9605-437d-9dbd-4282074730dc", name: "Kira" },
+  // Renamed from "Hornets outbound (Copy)" -> "Sports kit build" (the name still
+  // in the snapshot) -> "BOA Agent". Drop once the snapshot has the new name.
+  //
+  // Only ever alias a name to an ID when that name belongs to that assistant and
+  // nothing else. "panthers" was aliased here too, while Panthers was still just
+  // another name for this assistant; a separate Panthers assistant was then
+  // created and the alias silently sent its link to this one instead. An alias
+  // outranks nothing -- it is only consulted because the snapshot is stale -- so
+  // a wrong one is invisible until someone notices the voice is off.
+  "boa-agent": { id: "bfa288ee-97e8-4dc2-8998-97b33dca8805", name: "BOA Agent" },
+  // Created after the Aug 11 refresh, so the snapshot has no entry for it. This
+  // is a different assistant from BOA Agent above -- same demo, separate agent.
+  "panthers": { id: "a2cde3f8-4d00-4460-9712-ee9167e31b99", name: "Panthers" },
+  // Published after the Aug 14 refresh, so the snapshot has no entry for it.
+  // Temporary: drop this once /api/assistants is live, or once a refresh picks
+  // the name up. Same caution as above -- if "luna" is ever reused for a
+  // different assistant, this alias sends its link here instead.
+  "luna": { id: "49615404-043d-45f6-88ab-a502ea287f65", name: "luna" },
   "changebridge-dev": { id: "a212d3f9-0586-4608-ba53-dbae8b9a30a1", name: "Changebridge Medical Associates" },
   "changebridge-workflow": { id: "2a17ccc1-9189-4914-bab6-3b8284b04afc", name: "Changebridge Medical Associates" },
   "changebridge-max": { id: "0b8fb0fb-edb9-4d24-9e0a-fee26ed1bdda", name: "Changebridge Medical Associates" },
@@ -113,6 +141,24 @@ const App = () => {
     v.on("volume-level", handleVolumeLevel);
     v.on("error", handleError);
 
+    // Detaching the listeners below stops the app hearing the call; it does not
+    // end it. Without this the WebRTC session survives leaving the page and
+    // keeps playing audio, which is heard as a stuck murmur, or as a previous
+    // assistant talking over the next one's greeting.
+    const stopCall = () => {
+      try {
+        v.stop();
+      } catch (error) {
+        // Nothing in flight, or the session is already torn down.
+        console.warn("Vapi stop failed (likely no active call):", error);
+      }
+    };
+
+    // pagehide, not beforeunload: iOS Safari does not reliably fire
+    // beforeunload, and this is the case that matters on a phone. It does not
+    // fire on app switch, so backgrounding mid-call does not hang up.
+    window.addEventListener("pagehide", stopCall);
+
     return () => {
       v.off("call-start", handleCallStart);
       v.off("call-end", handleCallEnd);
@@ -120,6 +166,8 @@ const App = () => {
       v.off("speech-end", handleSpeechEnd);
       v.off("volume-level", handleVolumeLevel);
       v.off("error", handleError);
+      window.removeEventListener("pagehide", stopCall);
+      stopCall();
     };
   }, [selected]);
 
@@ -131,6 +179,11 @@ const App = () => {
 
   // Compute resolved assistant ID (exact or fuzzy) and track error state
   const resolvedAssistantId = useMemo(() => {
+    // A raw assistant ID in the URL is used as-is. voice-assistants.json only
+    // refreshes every few days, so a newly created or renamed assistant has no
+    // slug until it catches up; an ID link works the moment the assistant exists
+    // and can never point at the wrong one.
+    if (UUID_RE.test(selected)) return selected;
     const id = assistantIdMap[selected] || findBestAssistantId(assistantIdMap, selected);
     return id;
   }, [assistantIdMap, selected]);
@@ -138,8 +191,12 @@ const App = () => {
   // Also compute resolved slug and name for UI/analytics
   const resolvedAssistantSlug = useMemo(() => {
     if (!resolvedAssistantId) return undefined;
+    // Prefer the slug that was actually requested. Several slugs can point at one
+    // assistant (an alias plus its stale snapshot name), and the reverse lookup
+    // below would otherwise show whichever happens to come first in the map.
+    if (assistantIdMap[selected] === resolvedAssistantId) return selected;
     return Object.entries(assistantIdMap).find(([, id]) => id === resolvedAssistantId)?.[0];
-  }, [assistantIdMap, resolvedAssistantId]);
+  }, [assistantIdMap, resolvedAssistantId, selected]);
 
   const resolvedAssistantName = useMemo(() => {
     return resolvedAssistantSlug ? assistants[resolvedAssistantSlug]?.name : undefined;
@@ -155,29 +212,52 @@ const App = () => {
 
   // Fetch additional assistants if not using the default "kira"
   useEffect(() => {
-    if (selected !== "kira") {
-      setAssistantsLoading(true);
-      fetch("/voice-assistants.json")
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`Failed to fetch assistants: ${res.status}`);
-          }
-          return res.json();
-        })
-        .then(list => {
-          const newAssistants = { ...initialAssistants };
-          list.forEach(assistant => {
-            const key = slugify(assistant.name);
-            if (key) newAssistants[key] = { id: assistant.id, name: assistant.name };
-          });
-          setAssistants(newAssistants);
-        })
-        .catch(error => {
-          console.error("Error fetching assistants:", error);
-          setResolveError("Couldn't load assistants. Please refresh or try again.");
-        })
-        .finally(() => setAssistantsLoading(false));
-    }
+    if (selected === "kira") return;
+
+    let cancelled = false;
+    setAssistantsLoading(true);
+
+    // /api/assistants reads from Vapi at request time, so an assistant created
+    // or renamed minutes ago already resolves. voice-assistants.json is the
+    // fallback for when that route is unavailable: it is a hand-refreshed
+    // snapshot, days stale by the time anyone notices, and the reason a
+    // published assistant can report "no assistant matching this URL".
+    const loadList = async () => {
+      try {
+        const live = await fetch("/api/assistants");
+        if (live.ok) return await live.json();
+        console.warn(`Live assistant lookup unavailable (${live.status}); using snapshot.`);
+      } catch (error) {
+        console.warn("Live assistant lookup failed; using snapshot.", error);
+      }
+
+      const snapshot = await fetch("/voice-assistants.json");
+      if (!snapshot.ok) {
+        throw new Error(`Failed to fetch assistants: ${snapshot.status}`);
+      }
+      return await snapshot.json();
+    };
+
+    loadList()
+      .then(list => {
+        if (cancelled) return;
+        const newAssistants = { ...initialAssistants };
+        list.forEach(assistant => {
+          const key = slugify(assistant.name);
+          if (key) newAssistants[key] = { id: assistant.id, name: assistant.name };
+        });
+        setAssistants(newAssistants);
+      })
+      .catch(error => {
+        if (cancelled) return;
+        console.error("Error fetching assistants:", error);
+        setResolveError("Couldn't load assistants. Please refresh or try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setAssistantsLoading(false);
+      });
+
+    return () => { cancelled = true; };
   }, [selected]);
 
   // (Legacy listener effect removed; listeners are now bound in the ref-based effect above.)
@@ -431,7 +511,8 @@ const App = () => {
           />
           <div className="mb-6 text-center">
             <h2 className="text-2xl tracking-tight text-white mb-2">
-              {resolvedAssistantName || (selected === "kira" ? "kira™" : selected)}
+              {resolvedAssistantName
+                || (selected === "kira" ? "kira™" : (UUID_RE.test(selected) ? "Voice Demo" : selected))}
             </h2>
             <p className="text-blue-300 text-sm">Experience the future of AI conversations</p>
           </div>
